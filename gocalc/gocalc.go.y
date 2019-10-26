@@ -1,5 +1,5 @@
 %{
-package main
+package gocalc
 
 import (
     "fmt"
@@ -32,8 +32,29 @@ type BinOpExpr struct {
 %type<expr> program
 %type<expr> expr
 %token<token> NUMBER
-%token ADD
-%left ADD
+%token 	ADD SUB MUL DIV MOD
+		ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+		AND_ASSIGN OR_ASSIGN LSHIFT_ASSIGN RSHIFT_ASSIGN EXC_OR_ASSIGN
+		EQUAL NOTEQUAL INC DEC
+		GT GE LT LE LSHIFT RSHIFT
+		NOT BIT_AND BIT_OR LOGIC_AND LOGIC_OR LP RP LB RB IF ELSE
+		EXC_OR DOTDOTDOT LSB RSB
+		DOT COMMA SEMICOLON WHILE DEF RETURN_T SCOPE INJECTION
+		DEFER CONTINUE BREAK
+%right ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN LSHIFT_ASSIGN RSHIFT_ASSIGN EXC_OR_ASSIGN
+%left LOGIC_OR
+%left LOGIC_AND
+%left BIT_OR
+%left EXC_OR
+%left BIT_AND
+%left EQUAL NOTEQUAL
+%left GT GE LT LE
+%left LSHIFT RSHIFT
+%left ADD SUB INJECTION
+%left MUL DIV MOD
+%right CHILDA NOT NEGATIVE POSITIVE
+%left DOT FUNCCALL LSB
+%nonassoc LP
 
 %%
 
@@ -53,7 +74,23 @@ expr
     {
         $$ = BinOpExpr{left: $1, operator: '+', right: $3}
     }
-
+    | expr SUB expr
+    {
+        $$ = BinOpExpr{left: $1, operator: '-', right: $3}
+    }
+    | expr MUL expr
+    {
+        $$ = BinOpExpr{left: $1, operator: '*', right: $3}
+    }
+    | expr DIV expr
+    {
+        $$ = BinOpExpr{left: $1, operator: '/', right: $3}
+    }
+    | expr MOD expr
+    {
+        $$ = BinOpExpr{left: $1, operator: '%', right: $3}
+    }
+    ;
 %%
 
 type Lexer struct {
@@ -94,21 +131,18 @@ func (l *Lexer) Lex(lval *yySymType) int {
         if l.ready() {
             l.unget()
         }
-        fmt.Println("route A")
         return NUMBER
     } else if rn == '+' {
-        fmt.Println("route B")
         return ADD
     }
-    fmt.Println("route P")
-    panic("")
+    panic(fmt.Sprintf("invalid character: %c", rn))
 }
 
 func (l *Lexer) Error(e string) {
     panic(e)
 }
 
-func main() {
+func Parse(source string) {
     l := &Lexer {
         text: []rune(os.Args[1]),
         pos: 0,

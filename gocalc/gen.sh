@@ -1,0 +1,1 @@
+goyacc -o gocalc.go gocalc.go.y

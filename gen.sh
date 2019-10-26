@@ -1,0 +1,1 @@
+goyacc -o main.go main.go.y

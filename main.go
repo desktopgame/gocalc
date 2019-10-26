@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"text/scanner"
+	"unicode"
 )
 
 type Expression interface{}
@@ -37,13 +37,14 @@ type yySymType struct {
 }
 
 const NUMBER = 57346
+const ADD = 57347
 
 var yyToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
 	"NUMBER",
-	"'+'",
+	"ADD",
 }
 var yyStatenames = [...]string{}
 
@@ -54,17 +55,51 @@ const yyInitialStackSize = 16
 //line main.go.y:57
 
 type Lexer struct {
-	scanner.Scanner
+	text   []rune
+	pos    int
 	result Expression
 }
 
-func (l *Lexer) Lex(lval *yySymType) int {
-	token := int(l.Scan())
-	if token == scanner.Int {
-		token = NUMBER
+func (l *Lexer) get() rune {
+	if l.pos >= len(l.text) {
+		panic("could not read")
 	}
-	lval.token = Token{token: token, literal: l.TokenText()}
-	return token
+	rn := l.text[l.pos]
+	l.pos++
+	return rn
+}
+
+func (l *Lexer) unget() {
+	l.pos--
+}
+
+func (l *Lexer) ready() bool {
+	return l.pos < len(l.text)
+}
+
+func (l *Lexer) Lex(lval *yySymType) int {
+	if !l.ready() {
+		return -1
+	}
+	rn := l.get()
+	if unicode.IsDigit(rn) {
+		var buf strings.Builder
+		for unicode.IsDigit(rn) && l.ready() {
+			buf.WriteRune(rn)
+			rn = l.get()
+		}
+		lval.token = Token{token: NUMBER, literal: buf.String()}
+		if l.ready() {
+			l.unget()
+		}
+		fmt.Println("route A")
+		return NUMBER
+	} else if rn == '+' {
+		fmt.Println("route B")
+		return ADD
+	}
+	fmt.Println("route P")
+	panic("")
 }
 
 func (l *Lexer) Error(e string) {
@@ -72,8 +107,11 @@ func (l *Lexer) Error(e string) {
 }
 
 func main() {
-	l := new(Lexer)
-	l.Init(strings.NewReader(os.Args[1]))
+	l := &Lexer{
+		text:   []rune(os.Args[1]),
+		pos:    0,
+		result: NumExpr{},
+	}
 	yyParse(l)
 	fmt.Printf("%#v\n", l.result)
 }
@@ -119,15 +157,11 @@ var yyDef = [...]int{
 }
 var yyTok1 = [...]int{
 
-	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 5,
+	1,
 }
 var yyTok2 = [...]int{
 
-	2, 3, 4,
+	2, 3, 4, 5,
 }
 var yyTok3 = [...]int{
 	0,

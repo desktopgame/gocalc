@@ -3,7 +3,7 @@ package main
 
 import (
     "fmt"
-    "text/scanner"
+    "unicode"
     "os"
     "strings"
 )
@@ -32,8 +32,8 @@ type BinOpExpr struct {
 %type<expr> program
 %type<expr> expr
 %token<token> NUMBER
-
-%left '+'
+%token ADD
+%left ADD
 
 %%
 
@@ -49,7 +49,7 @@ expr
     {
         $$ = NumExpr{literal: $1.literal}
     }
-    | expr '+' expr
+    | expr ADD expr
     {
         $$ = BinOpExpr{left: $1, operator: '+', right: $3}
     }
@@ -57,17 +57,51 @@ expr
 %%
 
 type Lexer struct {
-    scanner.Scanner
+    text []rune
+    pos int
     result Expression
 }
 
-func (l *Lexer) Lex(lval *yySymType) int {
-    token := int(l.Scan())
-    if token == scanner.Int {
-        token = NUMBER
+func (l *Lexer) get() rune {
+    if l.pos >= len(l.text) {
+        panic("could not read")
     }
-    lval.token = Token{token: token, literal: l.TokenText()}
-    return token
+    rn := l.text[l.pos]
+    l.pos++
+    return rn
+}
+
+func (l *Lexer) unget() {
+    l.pos--
+}
+
+func (l *Lexer) ready() bool {
+    return l.pos < len(l.text)
+}
+
+func (l *Lexer) Lex(lval *yySymType) int {
+    if !l.ready() {
+        return -1
+    }
+    rn := l.get()
+    if unicode.IsDigit(rn) {
+        var buf strings.Builder
+        for unicode.IsDigit(rn) && l.ready() {
+            buf.WriteRune(rn)
+            rn = l.get()
+        }
+        lval.token = Token{token: NUMBER, literal: buf.String()}
+        if l.ready() {
+            l.unget()
+        }
+        fmt.Println("route A")
+        return NUMBER
+    } else if rn == '+' {
+        fmt.Println("route B")
+        return ADD
+    }
+    fmt.Println("route P")
+    panic("")
 }
 
 func (l *Lexer) Error(e string) {
@@ -75,8 +109,11 @@ func (l *Lexer) Error(e string) {
 }
 
 func main() {
-    l := new(Lexer)
-    l.Init(strings.NewReader(os.Args[1]))
+    l := &Lexer {
+        text: []rune(os.Args[1]),
+        pos: 0,
+        result: NumExpr{},
+    }
     yyParse(l)
     fmt.Printf("%#v\n", l.result)
 }

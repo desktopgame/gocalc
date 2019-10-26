@@ -9,7 +9,7 @@
       "command": "sudo",
       "args": ["bash", "gen.sh"],
       "options": {
-        "cwd": "${workspaceRoot}"
+        "cwd": "${workspaceRoot}/gocalc"
       }
     }
   ]

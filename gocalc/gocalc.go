@@ -9,11 +9,9 @@ import __yyfmt__ "fmt"
 
 import (
 	"fmt"
-	"strings"
-	"unicode"
 )
 
-//line gocalc.go.y:11
+//line gocalc.go.y:9
 type yySymType struct {
 	yys   int
 	token Token
@@ -112,66 +110,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line gocalc.go.y:75
-
-type Lexer struct {
-	text   []rune
-	pos    int
-	result Expression
-}
-
-func (l *Lexer) get() rune {
-	if l.pos >= len(l.text) {
-		panic("could not read")
-	}
-	rn := l.text[l.pos]
-	l.pos++
-	return rn
-}
-
-func (l *Lexer) unget() {
-	l.pos--
-}
-
-func (l *Lexer) ready() bool {
-	return l.pos < len(l.text)
-}
-
-func (l *Lexer) Lex(lval *yySymType) int {
-	if !l.ready() {
-		return -1
-	}
-	rn := l.get()
-	if unicode.IsDigit(rn) {
-		var buf strings.Builder
-		for unicode.IsDigit(rn) && l.ready() {
-			buf.WriteRune(rn)
-			rn = l.get()
-		}
-		lval.token = Token{token: NUMBER, literal: buf.String()}
-		l.unget()
-		return NUMBER
-	} else if rn == '+' {
-		return ADD
-	} else if rn == '-' {
-		return SUB
-	} else if rn == '*' {
-		return MUL
-	} else if rn == '/' {
-		return DIV
-	} else if rn == '%' {
-		return MOD
-	} else if rn == '(' {
-		return LP
-	} else if rn == ')' {
-		return RP
-	}
-	panic(fmt.Sprintf("invalid character: %c", rn))
-}
-
-func (l *Lexer) Error(e string) {
-	panic(e)
-}
+//line gocalc.go.y:73
 
 func Parse(source string) {
 	l := &Lexer{
@@ -582,50 +521,50 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:38
+//line gocalc.go.y:36
 		{
 			yyVAL.expr = yyDollar[1].expr
 			yylex.(*Lexer).result = yyVAL.expr
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:45
+//line gocalc.go.y:43
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:49
+//line gocalc.go.y:47
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '+', right: yyDollar[3].expr}
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:53
+//line gocalc.go.y:51
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '-', right: yyDollar[3].expr}
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:57
+//line gocalc.go.y:55
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '*', right: yyDollar[3].expr}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:61
+//line gocalc.go.y:59
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '/', right: yyDollar[3].expr}
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:65
+//line gocalc.go.y:63
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '%', right: yyDollar[3].expr}
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:71
+//line gocalc.go.y:69
 		{
 			yyVAL.expr = NumExpr{literal: yyDollar[1].token.literal}
 		}

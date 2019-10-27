@@ -29,7 +29,25 @@ func (l *Lexer) ready() bool {
 	return l.pos < len(l.text)
 }
 
+func (l *Lexer) skipSpace() {
+	r := false
+	for {
+		if !l.ready() {
+			r = true
+			break
+		}
+		rn := l.get()
+		if rn != ' ' {
+			break
+		}
+	}
+	if !r {
+		l.unget()
+	}
+}
+
 func (l *Lexer) Lex(lval *yySymType) int {
+	l.skipSpace()
 	if !l.ready() {
 		return -1
 	}

@@ -36,12 +36,19 @@ func (l *Lexer) Lex(lval *yySymType) int {
 	rn := l.get()
 	if unicode.IsDigit(rn) {
 		var buf strings.Builder
-		for unicode.IsDigit(rn) && l.ready() {
+		r := false
+		for unicode.IsDigit(rn) {
 			buf.WriteRune(rn)
+			if !l.ready() {
+				r = true
+				break
+			}
 			rn = l.get()
 		}
 		lval.token = Token{token: NUMBER, literal: buf.String()}
-		l.unget()
+		if !r {
+			l.unget()
+		}
 		return NUMBER
 	} else if rn == '+' {
 		return ADD

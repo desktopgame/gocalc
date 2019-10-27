@@ -7,11 +7,7 @@ import __yyfmt__ "fmt"
 
 //line gocalc.go.y:2
 
-import (
-	"fmt"
-)
-
-//line gocalc.go.y:9
+//line gocalc.go.y:5
 type yySymType struct {
 	yys   int
 	token Token
@@ -110,16 +106,16 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line gocalc.go.y:73
+//line gocalc.go.y:69
 
-func Parse(source string) {
+func Parse(source string) Expression {
 	l := &Lexer{
 		text:   []rune(source),
 		pos:    0,
 		result: NumExpr{},
 	}
 	yyParse(l)
-	fmt.Printf("%#v\n", l.result)
+	return l.result
 }
 
 //line yacctab:1
@@ -521,50 +517,50 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:36
+//line gocalc.go.y:32
 		{
 			yyVAL.expr = yyDollar[1].expr
 			yylex.(*Lexer).result = yyVAL.expr
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:43
+//line gocalc.go.y:39
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:47
+//line gocalc.go.y:43
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '+', right: yyDollar[3].expr}
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:51
+//line gocalc.go.y:47
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '-', right: yyDollar[3].expr}
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:55
+//line gocalc.go.y:51
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '*', right: yyDollar[3].expr}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:59
+//line gocalc.go.y:55
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '/', right: yyDollar[3].expr}
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:63
+//line gocalc.go.y:59
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '%', right: yyDollar[3].expr}
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:69
+//line gocalc.go.y:65
 		{
 			yyVAL.expr = NumExpr{literal: yyDollar[1].token.literal}
 		}

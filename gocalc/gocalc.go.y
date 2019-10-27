@@ -1,9 +1,5 @@
 %{
 package gocalc
-
-import (
-    "fmt"
-)
 %}
 
 %union{
@@ -72,12 +68,12 @@ primary
     ;
 %%
 
-func Parse(source string) {
+func Parse(source string) Expression {
     l := &Lexer {
         text: []rune(source),
         pos: 0,
         result: NumExpr{},
     }
     yyParse(l)
-    fmt.Printf("%#v\n", l.result)
+    return l.result
 }

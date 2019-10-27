@@ -28,18 +28,9 @@ type BinOpExpr struct {
     expr  Expression
 }
 
-%type<expr> program
-%type<expr> expr
+%type<expr> expr program primary
 %token<token> NUMBER
-%token 	ADD SUB MUL DIV MOD
-		ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
-		AND_ASSIGN OR_ASSIGN LSHIFT_ASSIGN RSHIFT_ASSIGN EXC_OR_ASSIGN
-		EQUAL NOTEQUAL INC DEC
-		GT GE LT LE LSHIFT RSHIFT
-		NOT BIT_AND BIT_OR LOGIC_AND LOGIC_OR LP RP LB RB IF ELSE
-		EXC_OR DOTDOTDOT LSB RSB
-		DOT COMMA SEMICOLON WHILE DEF RETURN_T SCOPE INJECTION
-		DEFER CONTINUE BREAK
+%token 	ADD SUB MUL DIV MOD LP RP
 %right ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN LSHIFT_ASSIGN RSHIFT_ASSIGN EXC_OR_ASSIGN
 %left LOGIC_OR
 %left LOGIC_AND
@@ -63,11 +54,11 @@ program
         $$ = $1
         yylex.(*Lexer).result = $$
     }
-
 expr
-    : NUMBER
+    : primary
+    | LP expr RP
     {
-        $$ = NumExpr{literal: $1.literal}
+        $$ = $2
     }
     | expr ADD expr
     {
@@ -88,6 +79,12 @@ expr
     | expr MOD expr
     {
         $$ = BinOpExpr{left: $1, operator: '%', right: $3}
+    }
+    ;
+primary
+    : NUMBER
+    {
+        $$ = NumExpr{literal: $1.literal}
     }
     ;
 %%
@@ -129,9 +126,7 @@ func (l *Lexer) Lex(lval *yySymType) int {
             rn = l.get()
         }
         lval.token = Token{token: NUMBER, literal: buf.String()}
-        if l.ready() {
-            l.unget()
-        }
+        l.unget()
         return NUMBER
     } else if rn == '+' {
         return ADD
@@ -143,6 +138,10 @@ func (l *Lexer) Lex(lval *yySymType) int {
         return DIV
     } else if rn == '%' {
         return MOD
+    } else if rn == '(' {
+        return LP
+    } else if rn == ')' {
+        return RP
     }
     panic(fmt.Sprintf("invalid character: %c", rn))
 }

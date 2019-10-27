@@ -41,57 +41,40 @@ const SUB = 57348
 const MUL = 57349
 const DIV = 57350
 const MOD = 57351
-const ASSIGN = 57352
-const ADD_ASSIGN = 57353
-const SUB_ASSIGN = 57354
-const MUL_ASSIGN = 57355
-const DIV_ASSIGN = 57356
-const MOD_ASSIGN = 57357
-const AND_ASSIGN = 57358
-const OR_ASSIGN = 57359
-const LSHIFT_ASSIGN = 57360
-const RSHIFT_ASSIGN = 57361
-const EXC_OR_ASSIGN = 57362
-const EQUAL = 57363
-const NOTEQUAL = 57364
-const INC = 57365
-const DEC = 57366
-const GT = 57367
-const GE = 57368
-const LT = 57369
-const LE = 57370
-const LSHIFT = 57371
-const RSHIFT = 57372
-const NOT = 57373
-const BIT_AND = 57374
-const BIT_OR = 57375
-const LOGIC_AND = 57376
-const LOGIC_OR = 57377
-const LP = 57378
-const RP = 57379
-const LB = 57380
-const RB = 57381
-const IF = 57382
-const ELSE = 57383
-const EXC_OR = 57384
-const DOTDOTDOT = 57385
-const LSB = 57386
-const RSB = 57387
-const DOT = 57388
-const COMMA = 57389
-const SEMICOLON = 57390
-const WHILE = 57391
-const DEF = 57392
-const RETURN_T = 57393
-const SCOPE = 57394
-const INJECTION = 57395
-const DEFER = 57396
-const CONTINUE = 57397
-const BREAK = 57398
-const CHILDA = 57399
-const NEGATIVE = 57400
-const POSITIVE = 57401
-const FUNCCALL = 57402
+const LP = 57352
+const RP = 57353
+const ASSIGN = 57354
+const ADD_ASSIGN = 57355
+const SUB_ASSIGN = 57356
+const MUL_ASSIGN = 57357
+const DIV_ASSIGN = 57358
+const MOD_ASSIGN = 57359
+const AND_ASSIGN = 57360
+const OR_ASSIGN = 57361
+const LSHIFT_ASSIGN = 57362
+const RSHIFT_ASSIGN = 57363
+const EXC_OR_ASSIGN = 57364
+const LOGIC_OR = 57365
+const LOGIC_AND = 57366
+const BIT_OR = 57367
+const EXC_OR = 57368
+const BIT_AND = 57369
+const EQUAL = 57370
+const NOTEQUAL = 57371
+const GT = 57372
+const GE = 57373
+const LT = 57374
+const LE = 57375
+const LSHIFT = 57376
+const RSHIFT = 57377
+const INJECTION = 57378
+const CHILDA = 57379
+const NOT = 57380
+const NEGATIVE = 57381
+const POSITIVE = 57382
+const DOT = 57383
+const FUNCCALL = 57384
+const LSB = 57385
 
 var yyToknames = [...]string{
 	"$end",
@@ -103,6 +86,8 @@ var yyToknames = [...]string{
 	"MUL",
 	"DIV",
 	"MOD",
+	"LP",
+	"RP",
 	"ASSIGN",
 	"ADD_ASSIGN",
 	"SUB_ASSIGN",
@@ -114,46 +99,27 @@ var yyToknames = [...]string{
 	"LSHIFT_ASSIGN",
 	"RSHIFT_ASSIGN",
 	"EXC_OR_ASSIGN",
+	"LOGIC_OR",
+	"LOGIC_AND",
+	"BIT_OR",
+	"EXC_OR",
+	"BIT_AND",
 	"EQUAL",
 	"NOTEQUAL",
-	"INC",
-	"DEC",
 	"GT",
 	"GE",
 	"LT",
 	"LE",
 	"LSHIFT",
 	"RSHIFT",
-	"NOT",
-	"BIT_AND",
-	"BIT_OR",
-	"LOGIC_AND",
-	"LOGIC_OR",
-	"LP",
-	"RP",
-	"LB",
-	"RB",
-	"IF",
-	"ELSE",
-	"EXC_OR",
-	"DOTDOTDOT",
-	"LSB",
-	"RSB",
-	"DOT",
-	"COMMA",
-	"SEMICOLON",
-	"WHILE",
-	"DEF",
-	"RETURN_T",
-	"SCOPE",
 	"INJECTION",
-	"DEFER",
-	"CONTINUE",
-	"BREAK",
 	"CHILDA",
+	"NOT",
 	"NEGATIVE",
 	"POSITIVE",
+	"DOT",
 	"FUNCCALL",
+	"LSB",
 }
 var yyStatenames = [...]string{}
 
@@ -161,7 +127,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line gocalc.go.y:93
+//line gocalc.go.y:90
 
 type Lexer struct {
 	text   []rune
@@ -200,9 +166,7 @@ func (l *Lexer) Lex(lval *yySymType) int {
 			rn = l.get()
 		}
 		lval.token = Token{token: NUMBER, literal: buf.String()}
-		if l.ready() {
-			l.unget()
-		}
+		l.unget()
 		return NUMBER
 	} else if rn == '+' {
 		return ADD
@@ -214,6 +178,10 @@ func (l *Lexer) Lex(lval *yySymType) int {
 		return DIV
 	} else if rn == '%' {
 		return MOD
+	} else if rn == '(' {
+		return LP
+	} else if rn == ')' {
+		return RP
 	}
 	panic(fmt.Sprintf("invalid character: %c", rn))
 }
@@ -241,39 +209,40 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 16
+const yyLast = 29
 
 var yyAct = [...]int{
 
-	4, 5, 6, 7, 8, 2, 6, 7, 8, 3,
-	9, 10, 11, 12, 13, 1,
+	6, 7, 8, 9, 10, 2, 17, 8, 9, 10,
+	11, 3, 12, 13, 14, 15, 16, 6, 7, 8,
+	9, 10, 5, 1, 0, 0, 0, 0, 4,
 }
 var yyPact = [...]int{
 
-	5, -1000, -5, -1000, 5, 5, 5, 5, 5, -1,
-	-1, -1000, -1000, -1000,
+	18, -1000, 12, -1000, 18, -1000, 18, 18, 18, 18,
+	18, -5, 0, 0, -1000, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 15, 5,
+	0, 5, 23, 11,
 }
 var yyR1 = [...]int{
 
-	0, 1, 2, 2, 2, 2, 2, 2,
+	0, 2, 1, 1, 1, 1, 1, 1, 1, 3,
 }
 var yyR2 = [...]int{
 
-	0, 1, 1, 3, 3, 3, 3, 3,
+	0, 1, 1, 3, 3, 3, 3, 3, 3, 1,
 }
 var yyChk = [...]int{
 
-	-1000, -1, -2, 4, 5, 6, 7, 8, 9, -2,
-	-2, -2, -2, -2,
+	-1000, -2, -1, -3, 10, 4, 5, 6, 7, 8,
+	9, -1, -1, -1, -1, -1, -1, 11,
 }
 var yyDef = [...]int{
 
-	0, -2, 1, 2, 0, 0, 0, 0, 0, 3,
-	4, 5, 6, 7,
+	0, -2, 1, 2, 0, 9, 0, 0, 0, 0,
+	0, 0, 4, 5, 6, 7, 8, 3,
 }
 var yyTok1 = [...]int{
 
@@ -285,8 +254,7 @@ var yyTok2 = [...]int{
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-	42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-	52, 53, 54, 55, 56, 57, 58, 59, 60,
+	42, 43,
 }
 var yyTok3 = [...]int{
 	0,
@@ -631,46 +599,52 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:62
+//line gocalc.go.y:53
 		{
 			yyVAL.expr = yyDollar[1].expr
 			yylex.(*Lexer).result = yyVAL.expr
 		}
-	case 2:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:69
-		{
-			yyVAL.expr = NumExpr{literal: yyDollar[1].token.literal}
-		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:73
+//line gocalc.go.y:60
 		{
-			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '+', right: yyDollar[3].expr}
+			yyVAL.expr = yyDollar[2].expr
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:77
+//line gocalc.go.y:64
 		{
-			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '-', right: yyDollar[3].expr}
+			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '+', right: yyDollar[3].expr}
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:81
+//line gocalc.go.y:68
 		{
-			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '*', right: yyDollar[3].expr}
+			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '-', right: yyDollar[3].expr}
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:85
+//line gocalc.go.y:72
 		{
-			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '/', right: yyDollar[3].expr}
+			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '*', right: yyDollar[3].expr}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:89
+//line gocalc.go.y:76
+		{
+			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '/', right: yyDollar[3].expr}
+		}
+	case 8:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line gocalc.go.y:80
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '%', right: yyDollar[3].expr}
+		}
+	case 9:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line gocalc.go.y:86
+		{
+			yyVAL.expr = NumExpr{literal: yyDollar[1].token.literal}
 		}
 	}
 	goto yystack /* stack new state and value */

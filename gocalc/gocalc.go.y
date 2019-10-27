@@ -4,7 +4,6 @@ package gocalc
 import (
     "fmt"
     "unicode"
-    "os"
     "strings"
 )
 
@@ -118,9 +117,11 @@ func (l *Lexer) ready() bool {
 
 func (l *Lexer) Lex(lval *yySymType) int {
     if !l.ready() {
+        fmt.Println("NR")
         return -1
     }
     rn := l.get()
+    fmt.Printf("%c\n", rn)
     if unicode.IsDigit(rn) {
         var buf strings.Builder
         for unicode.IsDigit(rn) && l.ready() {
@@ -134,6 +135,14 @@ func (l *Lexer) Lex(lval *yySymType) int {
         return NUMBER
     } else if rn == '+' {
         return ADD
+    } else if rn == '-' {
+        return SUB
+    } else if rn == '*' {
+        return MUL
+    } else if rn == '/' {
+        return DIV
+    } else if rn == '%' {
+        return MOD
     }
     panic(fmt.Sprintf("invalid character: %c", rn))
 }
@@ -144,7 +153,7 @@ func (l *Lexer) Error(e string) {
 
 func Parse(source string) {
     l := &Lexer {
-        text: []rune(os.Args[1]),
+        text: []rune(source),
         pos: 0,
         result: NumExpr{},
     }

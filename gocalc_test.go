@@ -4,5 +4,5 @@ import "testing"
 import "github.com/desktopgame/gocalc/gocalc"
 
 func TestParse(t *testing.T) {
-	gocalc.Parse("10+5")
+	gocalc.Parse("10+51")
 }

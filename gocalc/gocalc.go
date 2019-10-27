@@ -9,7 +9,6 @@ import __yyfmt__ "fmt"
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"unicode"
 )
@@ -29,7 +28,7 @@ type BinOpExpr struct {
 	right    Expression
 }
 
-//line gocalc.go.y:27
+//line gocalc.go.y:26
 type yySymType struct {
 	yys   int
 	token Token
@@ -162,7 +161,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line gocalc.go.y:94
+//line gocalc.go.y:93
 
 type Lexer struct {
 	text   []rune
@@ -189,9 +188,11 @@ func (l *Lexer) ready() bool {
 
 func (l *Lexer) Lex(lval *yySymType) int {
 	if !l.ready() {
+		fmt.Println("NR")
 		return -1
 	}
 	rn := l.get()
+	fmt.Printf("%c\n", rn)
 	if unicode.IsDigit(rn) {
 		var buf strings.Builder
 		for unicode.IsDigit(rn) && l.ready() {
@@ -205,6 +206,14 @@ func (l *Lexer) Lex(lval *yySymType) int {
 		return NUMBER
 	} else if rn == '+' {
 		return ADD
+	} else if rn == '-' {
+		return SUB
+	} else if rn == '*' {
+		return MUL
+	} else if rn == '/' {
+		return DIV
+	} else if rn == '%' {
+		return MOD
 	}
 	panic(fmt.Sprintf("invalid character: %c", rn))
 }
@@ -215,7 +224,7 @@ func (l *Lexer) Error(e string) {
 
 func Parse(source string) {
 	l := &Lexer{
-		text:   []rune(os.Args[1]),
+		text:   []rune(source),
 		pos:    0,
 		result: NumExpr{},
 	}
@@ -622,44 +631,44 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:63
+//line gocalc.go.y:62
 		{
 			yyVAL.expr = yyDollar[1].expr
 			yylex.(*Lexer).result = yyVAL.expr
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line gocalc.go.y:70
+//line gocalc.go.y:69
 		{
 			yyVAL.expr = NumExpr{literal: yyDollar[1].token.literal}
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:74
+//line gocalc.go.y:73
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '+', right: yyDollar[3].expr}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:78
+//line gocalc.go.y:77
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '-', right: yyDollar[3].expr}
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:82
+//line gocalc.go.y:81
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '*', right: yyDollar[3].expr}
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:86
+//line gocalc.go.y:85
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '/', right: yyDollar[3].expr}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line gocalc.go.y:90
+//line gocalc.go.y:89
 		{
 			yyVAL.expr = BinOpExpr{left: yyDollar[1].expr, operator: '%', right: yyDollar[3].expr}
 		}

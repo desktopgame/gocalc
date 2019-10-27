@@ -154,11 +154,9 @@ func (l *Lexer) ready() bool {
 
 func (l *Lexer) Lex(lval *yySymType) int {
 	if !l.ready() {
-		fmt.Println("NR")
 		return -1
 	}
 	rn := l.get()
-	fmt.Printf("%c\n", rn)
 	if unicode.IsDigit(rn) {
 		var buf strings.Builder
 		for unicode.IsDigit(rn) && l.ready() {

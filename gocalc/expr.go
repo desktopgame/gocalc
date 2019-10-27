@@ -1,6 +1,9 @@
 package gocalc
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Expression interface{}
 type Token struct {
@@ -35,4 +38,30 @@ func dumpImpl(expr Expression, depth int) {
 		dumpImpl(biExpr.right, depth+1)
 		break
 	}
+}
+
+func Eval(expr Expression) int {
+	switch (expr).(type) {
+	case NumExpr:
+		i, _ := strconv.Atoi(expr.(NumExpr).literal)
+		return i
+	case BinOpExpr:
+		biExpr := expr.(BinOpExpr)
+		lval := Eval(biExpr.left)
+		rval := Eval(biExpr.right)
+		if biExpr.operator == '+' {
+			return lval + rval
+		} else if biExpr.operator == '-' {
+			return lval - rval
+		} else if biExpr.operator == '*' {
+			return lval * rval
+		} else if biExpr.operator == '/' {
+			return lval / rval
+		} else if biExpr.operator == '%' {
+			return lval % rval
+		} else {
+			panic("unsupported operator")
+		}
+	}
+	panic("unsupported expression")
 }
